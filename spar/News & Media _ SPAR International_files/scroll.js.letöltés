@@ -1,0 +1,49 @@
+/**
+ * Created by asit on 31/03/16.
+ */
+function elmInScroll(elem) {
+    var docViewTop = $(window).scrollTop();
+    var docViewBottom = docViewTop + $(window).height();
+
+    var elemTop = $(elem).offset().top;
+    var elemBottom = elemTop + $(elem).height();
+
+    return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+}
+
+var scrolling=false;
+var noMoreNews=false;
+
+function initNewsScroll() {
+
+
+    $(document).scroll(function (e) {
+        if (elmInScroll("#news .row div:last")) {
+            //get new elements
+                if(!scrolling && !noMoreNews) {
+                    scrolling = true;
+
+                    var data = {
+                        'action': 'pressroom_items',
+                        'p': ++newsPage,
+                        't': newsCategory,
+                        'c': newsCountry
+                    };
+
+                    jQuery.post(ajaxurl, data, function (response) {
+                        // console.log('Got this from the server: ' + response);
+                        $("#news .row").append(response);
+                        scrolling=false;
+                        if(response.length<=0){
+                            noMoreNews=true;
+                        }
+                    });
+                }
+
+            // var elm = $("#news .row div:first");
+            // $("#news .row").append(elm.clone());
+        }
+        ;
+    });
+}
+initNewsScroll();
